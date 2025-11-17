@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import Hls from "hls.js";
+import ReactPlayer from 'react-player'
 
 export function Player() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -43,18 +44,20 @@ export function Player() {
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
-        height: "100vh", // full page center
-        background: "#000", // optional
+        height: "100vh",
+        background: "#000",
       }}
     >
-      <video
+      <ReactPlayer
         ref={videoRef}
         controls
-        muted
+        muted={false}
         autoPlay
         playsInline
+        playing
+        width="100%"
+        height="auto"
         style={{
-          width: "100%",
           maxWidth: "1280px",
           borderRadius: "8px",
           background: "black",

@@ -1,4 +1,4 @@
-require("dotenv").config();
+// require("dotenv").config();
 const path = require("path");
 
 const {
@@ -62,9 +62,9 @@ module.exports = {
         "-use_wallclock_as_timestamps", "1",
 
         // VIDEO ENCODING
-        "-c:v", "h264_nvenc",
-        "-preset", "fast",
-        "-rc", "vbr",
+        "-c:v", "libx264",
+        "-preset", "veryfast",
+        "-tune", "zerolatency",
         "-b:v", VIDEO_BITRATE,
         "-maxrate", VIDEO_BITRATE,
         "-bufsize", "2M",

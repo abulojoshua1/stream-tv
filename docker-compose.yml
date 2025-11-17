@@ -7,12 +7,30 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:80"          # host:container (change 8080 if you want)
+      - "8080:80"
     restart: unless-stopped
-    volumes:
-      # HLS output folder so ffmpeg (on host or another container) can write segments here
-      - ./hls:/usr/share/nginx/html/hls:rw
+
+    devices:
+      - "/dev/video2:/dev/video2"  # USB Capture Card
+
     environment:
-      # add anything your React build might read at build-time (VITE_*/REACT_APP_*)
-      # VITE_API_BASE_URL: "http://localhost:5000"
-      NODE_ENV: "production"
+      NODE_ENV: production
+      VIDEO_DEVICE: "/dev/video2"
+      PULSE_SOURCE: "alsa_input.usb-MACROSILICON_USB_Video-02.iec958-stereo"
+      VIDEO_WIDTH: "1920"
+      VIDEO_HEIGHT: "1080"
+      FRAMERATE: "30"
+      VIDEO_BITRATE: "3000k"
+      AUDIO_BITRATE: "128k"
+      HLS_DIR: "/usr/share/nginx/html/hls"
+
+      # PulseAudio (host to container)
+      PULSE_SERVER: "unix:/run/user/1000/pulse/native"
+
+    volumes:
+      - ./hls:/usr/share/nginx/html/hls:rw
+
+      # Audio plumbing
+      - /run/user/1000/pulse:/run/user/1000/pulse
+      - ~/.config/pulse:/root/.config/pulse
+

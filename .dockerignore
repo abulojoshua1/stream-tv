@@ -1,0 +1,101 @@
+########################################
+# Node / React
+########################################
+node_modules/
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Build output (Vite/React)
+dist/
+build/
+.vite/
+vite.svg
+vite.config.*
+
+
+########################################
+# React Static Assets and Dev Junk
+########################################
+# Auto-generated assets
+public/hls/
+public/assets/
+public/.well-known/
+
+# Temporary React dev files
+*.local
+*.cache
+.cache/
+.eslintcache
+.stylelintcache
+.storybook/
+
+# CRA (if components existed earlier)
+.env.development.local
+.env.test.local
+.env.production.local
+
+
+########################################
+# HLS Streaming Output
+########################################
+hls/
+*.ts
+*.m3u8
+live*.ts
+live*.m3u8
+
+
+########################################
+# Logs
+########################################
+logs/
+*.log
+*.pid
+*.seed
+*.pid.lock
+ffmpeg.log
+
+
+########################################
+# Operating System Files
+########################################
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+
+
+########################################
+# IDE / Editor files
+########################################
+.vscode/
+.idea/
+*.iml
+*.sublime-workspace
+*.sublime-project
+
+
+########################################
+# Docker garbage
+########################################
+.dockerignore
+Dockerfile*
+docker-compose*
+.tmp/
+
+
+########################################
+# Test files (optional)
+########################################
+__/tests__/
+coverage/
+*.spec.js
+*.spec.ts
+*.test.js
+*.test.ts
+jest/
+cypress/

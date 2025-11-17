@@ -8,25 +8,23 @@ const {
   FRAMERATE = "25",
   VIDEO_BITRATE = "1500k",
   AUDIO_BITRATE = "96k",
-  HLS_DIR = "./hls",  // <<==== ALWAYS RELATIVE (NO LEADING SLASH)
 } = process.env;
 
 // GOP = framerate * 2
 const gop = String(Number(FRAMERATE) * 2 || 50);
+
+// Absolute resolved path for reliability
+const HLS_DIR = process.env.HLS_DIR || path.join(__dirname, "public", "hls");
 
 module.exports = {
   apps: [
     {
       name: "FFMPEG-HLS-STREAM",
 
-      // Run exactly in the directory where this file lives
       cwd: __dirname,
-
-      // Run ffmpeg directly
       script: "ffmpeg",
       exec_mode: "fork",
 
-      // Restart behavior
       autorestart: true,
       restart_delay: 2000,
       max_restarts: 1000,
@@ -40,7 +38,7 @@ module.exports = {
         FRAMERATE,
         VIDEO_BITRATE,
         AUDIO_BITRATE,
-        HLS_DIR: "./hls", // FORCE CORRECT RELATIVE PATH
+        HLS_DIR,
       },
 
       args: [
@@ -64,7 +62,7 @@ module.exports = {
         // TIMESTAMPS
         "-use_wallclock_as_timestamps", "1",
 
-        // VIDEO ENCODING (NVENC)
+        // VIDEO ENCODING
         "-c:v", "h264_nvenc",
         "-preset", "fast",
         "-rc", "vbr",
@@ -86,8 +84,11 @@ module.exports = {
         "-hls_time", "2",
         "-hls_list_size", "6",
         "-hls_flags", "delete_segments+append_list+independent_segments",
-        "-hls_segment_filename", path.join("./hls", "live_%03d.ts"),
-        path.join("./hls", "live.m3u8"),
+
+        "-hls_segment_filename",
+        path.join(HLS_DIR, "live_%03d.ts"),
+
+        path.join(HLS_DIR, "live.m3u8"),
       ],
     },
   ],

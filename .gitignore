@@ -25,3 +25,4 @@ dist-ssr
 
 # Ignore HLS output directory and all generated segment files
 hls/
+public/hls/

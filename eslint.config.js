@@ -6,7 +6,13 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // Global ignore patterns — ESLint v9 way
+  globalIgnores([
+    'dist',
+    '**/hls/**',       // Ignore all HLS segment directories
+    '**/public/hls/**' // Explicit ignore for public/hls
+  ]),
+
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

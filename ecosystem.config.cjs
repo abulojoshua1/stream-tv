@@ -5,8 +5,8 @@ const {
   PULSE_SOURCE = "alsa_input.usb-MACROSILICON_USB_Video-02.iec958-stereo",
   VIDEO_WIDTH = "1920",
   VIDEO_HEIGHT = "1080",
-  FRAMERATE = "30",
-  VIDEO_BITRATE = "3000k",
+  FRAMERATE = "40",
+  VIDEO_BITRATE = "5000k",
   AUDIO_BITRATE = "128k",
   HLS_DIR = path.join(__dirname, "public", "hls"),
 } = process.env;

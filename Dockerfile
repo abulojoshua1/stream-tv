@@ -29,7 +29,7 @@ FROM nginx:alpine
 RUN apk add --no-cache ffmpeg nodejs npm
 
 # Install pm2 globally
-RUN npm install -g pm2 dotenv
+RUN npm install -g pm2
 
 # Remove default Nginx configuration
 RUN rm /etc/nginx/conf.d/default.conf

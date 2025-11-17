@@ -4,11 +4,11 @@ const path = require("path");
 const {
   VIDEO_DEVICE = "/dev/video2",
   PULSE_SOURCE = "alsa_input.usb-MACROSILICON_USB_Video-02.iec958-stereo",
-  VIDEO_WIDTH = "1280",
-  VIDEO_HEIGHT = "720",
-  FRAMERATE = "25",
-  VIDEO_BITRATE = "1500k",
-  AUDIO_BITRATE = "96k",
+  VIDEO_WIDTH = "1920",
+  VIDEO_HEIGHT = "1080",
+  FRAMERATE = "30",
+  VIDEO_BITRATE = "3000k",
+  AUDIO_BITRATE = "128k",
   HLS_DIR = path.join(__dirname, "public", "hls"),
 } = process.env;
 

@@ -26,3 +26,9 @@ dist-ssr
 # Ignore HLS output directory and all generated segment files
 hls/
 public/hls/
+
+# CRA (if components existed earlier)
+.env.development.local
+.env.test.local
+.env.production.local
+.env

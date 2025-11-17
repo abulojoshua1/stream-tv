@@ -1,3 +1,4 @@
+require("dotenv").config();
 const path = require("path");
 
 const {
@@ -8,13 +9,11 @@ const {
   FRAMERATE = "25",
   VIDEO_BITRATE = "1500k",
   AUDIO_BITRATE = "96k",
+  HLS_DIR = path.join(__dirname, "public", "hls"),
 } = process.env;
 
 // GOP = framerate * 2
 const gop = String(Number(FRAMERATE) * 2 || 50);
-
-// Absolute resolved path for reliability
-const HLS_DIR = process.env.HLS_DIR || path.join(__dirname, "public", "hls");
 
 module.exports = {
   apps: [

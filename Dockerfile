@@ -1,62 +1,41 @@
-# =========================================
-# Stage 1: Build React frontend (Vite) with pnpm
-# =========================================
-FROM node:22-alpine AS builder
+# Stage 1: Build the React app
+FROM node:20-alpine AS build
 
+# Set the working directory inside the container
 WORKDIR /app
 
-# Enable pnpm (via corepack) – recommended for Node 22
-RUN corepack enable
+# Install pnpm
+RUN npm install -g pnpm
 
-# Copy manifest + lock first (better layer caching)
-COPY package.json pnpm-lock.yaml ./
+# Copy package.json and package-lock.json files (or pnpm-lock.yaml if using pnpm)
+COPY package.json ./
 
-# Install all deps for build using pnpm
-RUN pnpm install --frozen-lockfile
+# If you're using pnpm, uncomment the line below
+COPY pnpm-lock.yaml ./
 
-# Copy the rest of the source
+# Install the dependencies using pnpm
+RUN pnpm install
+
+# Copy the rest of the application code
 COPY . .
 
-# Build Vite app -> dist/
+# Build the React app
 RUN pnpm run build
 
+# Stage 2: Serve the React app with Nginx
+FROM nginx:alpine
 
-# =========================================
-# Stage 2: Runtime - pm2 + ffmpeg + built React
-# =========================================
-FROM node:22-alpine
+# Remove default Nginx configuration
+RUN rm /etc/nginx/conf.d/default.conf
 
-WORKDIR /app
+# Copy custom Nginx configuration file
+COPY nginx.conf /etc/nginx/conf.d/
 
-RUN apk add --no-cache ffmpeg
-RUN corepack enable
+# Copy only the build output to the Nginx HTML directory
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy manifest + lock and install only prod deps
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --prod --frozen-lockfile
+# Expose port 80 to the outside world
+EXPOSE 80
 
-# Copy built frontend from builder stage (dist -> frontend)
-COPY --from=builder /app/dist ./frontend
-
-# PM2 config
-COPY ecosystem.config.cjs ./ecosystem.config.cjs
-
-# HLS directory where ffmpeg will write (shared with nginx via volume)
-RUN mkdir -p /app/frontend/hls && chmod 755 /app/frontend/hls
-
-# Default environment variables
-ENV VIDEO_DEVICE=/dev/video2 \
-    PULSE_SOURCE=alsa_input.usb-MACROSILICON_USB_Video-02.iec958-stereo \
-    VIDEO_WIDTH=1280 \
-    VIDEO_HEIGHT=720 \
-    FRAMERATE=25 \
-    VIDEO_BITRATE=1500k \
-    AUDIO_BITRATE=96k \
-    HLS_DIR=/app/frontend/hls \
-    REDIS_URL=redis://redis:6379/0
-
-# We don't expose HTTP here; nginx serves the files.
-# EXPOSE 3000
-
-# Use pm2-runtime from local node_modules
-CMD ["npx", "pm2-runtime", "ecosystem.config.cjs"]
+# Command to run Nginx
+CMD ["nginx", "-g", "daemon off;"]

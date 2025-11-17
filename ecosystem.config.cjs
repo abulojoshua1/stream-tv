@@ -6,7 +6,7 @@ const {
   VIDEO_WIDTH = "1920",
   VIDEO_HEIGHT = "1080",
   FRAMERATE = "40",
-  VIDEO_BITRATE = "5000k",
+  VIDEO_BITRATE = "6000k",
   AUDIO_BITRATE = "128k",
   HLS_DIR = path.join(__dirname, "public", "hls"),
 } = process.env;

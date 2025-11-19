@@ -6,31 +6,44 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+
     ports:
       - "5000:80"
+
     restart: unless-stopped
 
     devices:
-      - "/dev/video2:/dev/video2"  # USB Capture Card
+      - "/dev/video2:/dev/video2"
+
+    # Completely flexible CPU usage (max by default)
+    deploy:
+      resources:
+        reservations:
+          # Ensures container gets proper CPU priority
+          cpus: '0.50'
 
     environment:
       NODE_ENV: production
+
       VIDEO_DEVICE: "/dev/video2"
       PULSE_SOURCE: "alsa_input.usb-MACROSILICON_USB_Video-02.iec958-stereo"
+
       VIDEO_WIDTH: "1920"
       VIDEO_HEIGHT: "1080"
       FRAMERATE: "30"
       VIDEO_BITRATE: "3000k"
       AUDIO_BITRATE: "128k"
+
       HLS_DIR: "/usr/share/nginx/html/hls"
 
-      # PulseAudio (host to container)
+      # FFMPEG THREADS (0 = all cores)
+      FFMPEG_THREADS: "0"
+
       PULSE_SERVER: "unix:/run/user/1000/pulse/native"
 
     volumes:
       - ./hls:/usr/share/nginx/html/hls:rw
 
-      # Audio plumbing
+      # Audio
       - /run/user/1000/pulse:/run/user/1000/pulse
       - ~/.config/pulse:/root/.config/pulse
-

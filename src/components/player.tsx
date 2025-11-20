@@ -43,7 +43,7 @@ export function Player() {
 
       hls.on(Hls.Events.ERROR, (_, data) => {
         if (data.fatal) {
-          setError("Houston, we have a buffering problem. Hit reload and engage streaming thrusters!");
+          setError("Signal jam! Time to reload and retry!");
         }
       });
 
@@ -52,7 +52,7 @@ export function Player() {
       };
     }
 
-    setError("Looks like your browser isn't ready for live streaming. Try a different one or join the 21st century!");
+    setError("This browser cannot play live streams!");
   }, []);
 
   if (error) {

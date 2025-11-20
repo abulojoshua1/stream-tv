@@ -3,20 +3,20 @@ import { createTheme } from "@mui/material";
 export const darkTheme = createTheme({
   palette: {
     primary: {
-      main: "#c14c3b",
-      light: "#181A33",
+      main: "#023047",
+      light: "#219ebc",
     },
     secondary: {
-      main: "#202137",
+      main: "#c4d0ba",
     },
     success: {
-      main: "#2E657D",
+      main: "#8ecae6",
     },
     error: {
         main: '#c14c3b'
     },
     warning: {
-        main: '#f0800a'
+        main: '#fb8500'
     },
     mode: "dark",
     text: {

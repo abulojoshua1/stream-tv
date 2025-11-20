@@ -3,6 +3,8 @@ import Hls from "hls.js";
 import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
 import { Box, Alert, Stack, Button } from "@mui/material";
 
+// https://coolors.co/palettes/trending Black & Gold Elegance https://coolors.co/palette/000000-14213d-fca311-e5e5e5-ffffff
+
 export function Player() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +65,6 @@ export function Player() {
           sx={{
             position: "relative",
             aspectRatio: "16/9",
-            borderRadius: 2,
             overflow: "hidden",
             display: "flex",
             justifyContent: "center",
@@ -136,7 +137,7 @@ export function Player() {
           maxWidth: 1280,
           height: "100%",
           borderRadius: 2,
-          backgroundColor: "black",
+          backgroundColor: "#000000",
           objectFit: "contain",
         }}
       />

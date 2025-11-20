@@ -15,7 +15,7 @@ export function App() {
         alignItems="center"
         width="100%"
         height="100vh"
-        bgcolor="black"
+        bgcolor="#000000"
         overflow="hidden"
       >
         <Player />

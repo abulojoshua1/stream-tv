@@ -1,14 +1,25 @@
 import { Player } from './components/player';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import theme from './theme';
+import { Box } from "@mui/material";
+import { darkTheme } from './theme';
 
 export function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={darkTheme}>
       {/* CssBaseline applies global styles such as background and font */}
       <CssBaseline />
-      <Player />
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        width="100%"
+        height="100vh"
+        bgcolor="black"
+        overflow="hidden"
+      >
+        <Player />
+      </Box>
     </ThemeProvider>
   );
 }

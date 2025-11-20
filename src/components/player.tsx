@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
-import ReplayIcon from '@mui/icons-material/Replay';
+import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
 import { Box, Alert, Stack, Button } from "@mui/material";
 
 export function Player() {
@@ -57,16 +57,6 @@ export function Player() {
 
   if (error) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        width="100%"
-        height="100vh"
-        bgcolor="black"
-        overflow="hidden"
-        p={2}
-      >
         <Box
           width="100%"
           maxWidth={1280}
@@ -112,39 +102,28 @@ export function Player() {
             sx={{ zIndex: 1000 }}
             spacing={2}
           >
+            <Box display="flex" justifyContent="center">
+              <Button
+                color="warning"
+                variant="outlined"
+                startIcon={<ReplayCircleFilledIcon />}
+                onClick={() => window.location.reload()}
+              >
+                RELOAD
+              </Button>
+            </Box>
             <Alert
-              severity="error"
+              severity="warning"
               variant="filled"
             >
               {error}
             </Alert>
-            <Box display="flex" justifyContent="center">
-              <Button
-                variant="contained"
-                startIcon={<ReplayIcon />}
-                size="small"
-                onClick={() => window.location.reload()}
-              >
-                Reload
-              </Button>
-            </Box>
           </Stack>
         </Box>
-      </Box>
     );
   }
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      width="100%"
-      height="100vh"
-      bgcolor="black"
-      overflow="hidden"
-      p={2}
-    >
       <Box
         component="video"
         ref={videoRef}
@@ -161,6 +140,5 @@ export function Player() {
           objectFit: "contain",
         }}
       />
-    </Box>
   );
 }

@@ -5,7 +5,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, Alert, Stack, Button, IconButton, Slider } from "@mui/material";
 
 export function Player() {
@@ -15,6 +15,17 @@ export function Player() {
   const [isMuted, setIsMuted] = useState(true);
   const [isPaused, setIsPaused] = useState(true);
   const [volume, setVolume] = useState(0); // 0–100 slider value
+
+  useEffect(() => {
+    // Disable scroll
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      // Restore scroll when component unmounts
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
 
   // Sync video.play() and video.pause() to state
   useEffect(() => {
@@ -184,39 +195,55 @@ export function Player() {
           height: "100%",
           backgroundColor: "#000000",
           objectFit: "contain",
-          border: "1px solid #fb8500",
+          border: "1px solid #ffffff",
         }}
       />
 
-      <Box bgcolor="#fb8500" px={2}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Box bgcolor="#ffffff" p={2}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
           {/* LEFT SIDE CONTROLS */}
           <Stack direction="row" spacing={2} alignItems="center">
-
             {isPaused ? (
-              <IconButton onClick={handlePlay}><PlayArrowIcon /></IconButton>
+              <IconButton size="large" color="primary" onClick={handlePlay}>
+                <PlayArrowIcon fontSize="inherit" />
+              </IconButton>
             ) : (
-              <IconButton onClick={handlePause}><StopCircleIcon /></IconButton>
+              <IconButton size="large" color="primary" onClick={handlePause}>
+                <StopCircleIcon fontSize="inherit" />
+              </IconButton>
             )}
 
             {isMuted ? (
-              <IconButton onClick={handleToggleMute}><VolumeOffIcon /></IconButton>
+              <IconButton size="large" color="primary" onClick={handleToggleMute}>
+                <VolumeOffIcon fontSize="inherit" />
+              </IconButton>
             ) : (
-              <IconButton onClick={handleToggleMute}><VolumeUpIcon /></IconButton>
+              <IconButton size="large" color="primary" onClick={handleToggleMute}>
+                <VolumeUpIcon fontSize="inherit" />
+              </IconButton>
             )}
-                        {/* VOLUME SLIDER */}
-            <Slider
-              value={volume}
-              onChange={handleVolumeChange}
-              min={0}
-              max={100}
-              sx={{ width: 100, color: "#ffffff" }}
-            />
+            <Stack pl={3}>
+              {/* VOLUME SLIDER */}
+              <Slider
+                value={volume}
+                onChange={handleVolumeChange}
+                min={0}
+                max={100}
+                sx={{
+                  width: 60,
+                  color: "#000000",
+                }}
+              />
+            </Stack>
           </Stack>
 
           {/* FULLSCREEN */}
-          <IconButton onClick={handleFullscreen}>
-            <FullscreenIcon />
+          <IconButton size="large" color="primary" onClick={handleFullscreen}>
+            <OpenInFullIcon fontSize="inherit" />
           </IconButton>
         </Stack>
       </Box>

@@ -4,6 +4,7 @@ import ReplayCircleFilledIcon from "@mui/icons-material/ReplayCircleFilled";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
+import VolumeDownIcon from "@mui/icons-material/VolumeDown";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, Alert, Stack, Button, IconButton, Slider } from "@mui/material";
@@ -14,7 +15,8 @@ export function Player() {
 
   const [isMuted, setIsMuted] = useState(true);
   const [isPaused, setIsPaused] = useState(true);
-  const [volume, setVolume] = useState(0); // 0–100 slider value
+  const [volume, setVolume] = useState(0); // effective slider value (0 when muted)
+  const [lastVolume, setLastVolume] = useState(80); // restored on unmute
 
   useEffect(() => {
     // Disable scroll
@@ -96,18 +98,18 @@ export function Player() {
     const video = videoRef.current;
     if (!video) return;
 
-    const newMuted = !video.muted;
-
-    video.muted = newMuted;
-    setIsMuted(newMuted);
-
-    // If unmuting, restore last volume or default to 100%
-    if (!newMuted) {
-      if (volume === 0) {
-        setVolume(100);
-        video.volume = 1;
-      }
+    if (isMuted) {
+      const restore = lastVolume > 0 ? lastVolume : 80;
+      video.muted = false;
+      video.volume = restore / 100;
+      setIsMuted(false);
+      setVolume(restore);
       video.play();
+    } else {
+      setLastVolume(volume);
+      video.muted = true;
+      setIsMuted(true);
+      setVolume(0);
     }
   };
 
@@ -118,14 +120,15 @@ export function Player() {
     const vol = Array.isArray(newValue) ? newValue[0] : newValue;
 
     setVolume(vol);
-    videoRef.current.volume = vol / 100;
 
-    if (vol > 0 && isMuted) {
-      videoRef.current.muted = false;
-      setIsMuted(false);
-    }
-
-    if (vol === 0 && !isMuted) {
+    if (vol > 0) {
+      setLastVolume(vol);
+      videoRef.current.volume = vol / 100;
+      if (isMuted) {
+        videoRef.current.muted = false;
+        setIsMuted(false);
+      }
+    } else {
       videoRef.current.muted = true;
       setIsMuted(true);
     }
@@ -217,28 +220,23 @@ export function Player() {
               </IconButton>
             )}
 
-            {isMuted ? (
-              <IconButton size="large" color="primary" onClick={handleToggleMute}>
+            <IconButton size="large" color="primary" onClick={handleToggleMute}>
+              {isMuted || volume === 0 ? (
                 <VolumeOffIcon fontSize="inherit" />
-              </IconButton>
-            ) : (
-              <IconButton size="large" color="primary" onClick={handleToggleMute}>
+              ) : volume < 50 ? (
+                <VolumeDownIcon fontSize="inherit" />
+              ) : (
                 <VolumeUpIcon fontSize="inherit" />
-              </IconButton>
-            )}
-            <Stack pl={3}>
-              {/* VOLUME SLIDER */}
-              <Slider
-                value={volume}
-                onChange={handleVolumeChange}
-                min={0}
-                max={100}
-                sx={{
-                  width: 60,
-                  color: "#000000",
-                }}
-              />
-            </Stack>
+              )}
+            </IconButton>
+            {/* VOLUME SLIDER */}
+            <Slider
+              value={volume}
+              onChange={handleVolumeChange}
+              min={0}
+              max={100}
+              sx={{ width: 90, color: "#000000" }}
+            />
           </Stack>
 
           {/* FULLSCREEN */}

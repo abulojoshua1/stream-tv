@@ -18,13 +18,6 @@ export function Player() {
   const [lastVolume, setLastVolume] = useState(80);
   const [controlsVisible, setControlsVisible] = useState(true);
 
-  // Disable page scroll
-  useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = originalStyle; };
-  }, []);
-
   const scheduleHide = () => {
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
     hideTimerRef.current = setTimeout(() => setControlsVisible(false), 3500);

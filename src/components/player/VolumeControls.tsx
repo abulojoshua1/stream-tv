@@ -9,7 +9,7 @@ interface Props {
   isMuted: boolean;
   volume: number;
   onToggleMute: () => void;
-  onVolumeChange: (_: any, newValue: number | number[]) => void;
+  onVolumeChange: (_: Event, newValue: number | number[]) => void;
   onFullscreen: () => void;
 }
 

@@ -25,6 +25,11 @@ export function Player() {
     return () => { document.body.style.overflow = originalStyle; };
   }, []);
 
+  const scheduleHide = () => {
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    hideTimerRef.current = setTimeout(() => setControlsVisible(false), 3500);
+  };
+
   // Auto-hide controls on mount
   useEffect(() => {
     scheduleHide();
@@ -97,13 +102,8 @@ export function Player() {
       return () => hls.destroy();
     }
 
-    setError("This browser cannot play live streams!");
+    queueMicrotask(() => setError("This browser cannot play live streams!"));
   }, []);
-
-  const scheduleHide = () => {
-    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-    hideTimerRef.current = setTimeout(() => setControlsVisible(false), 3500);
-  };
 
   const handleMouseMove = () => {
     setControlsVisible(true);
@@ -128,7 +128,7 @@ export function Player() {
     }
   };
 
-  const handleVolumeChange = (_: any, newValue: number | number[]) => {
+  const handleVolumeChange = (_: Event, newValue: number | number[]) => {
     if (!videoRef.current) return;
     const vol = Array.isArray(newValue) ? newValue[0] : newValue;
     setVolume(vol);

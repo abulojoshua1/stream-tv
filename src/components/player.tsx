@@ -8,6 +8,7 @@ import VolumeDownIcon from "@mui/icons-material/VolumeDown";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import { Box, Alert, Stack, Button, IconButton, Slider } from "@mui/material";
+import { colors } from "../theme";
 
 export function Player() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -78,12 +79,24 @@ export function Player() {
       hls.loadSource(src);
       hls.attachMedia(video);
 
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
+        // Empty playlist — manifest loaded but contains no stream levels
+        if (data.levels.length === 0) {
+          setError("Signal jam! Time to reload and retry!");
+          return;
+        }
         video.play().catch(() => {});
       });
 
       hls.on(Hls.Events.ERROR, (_, data) => {
-        if (data.fatal) setError("Signal jam! Time to reload and retry!");
+        if (data.fatal) {
+          setError("Signal jam! Time to reload and retry!");
+          return;
+        }
+        // Non-fatal but unrecoverable: empty or invalid manifest
+        if (data.details === Hls.ErrorDetails.MANIFEST_PARSING_ERROR) {
+          setError("Signal jam! Time to reload and retry!");
+        }
       });
 
       return () => hls.destroy();
@@ -192,7 +205,7 @@ export function Player() {
         width: "100%",
         maxWidth: 1280,
         aspectRatio: "16/9",
-        bgcolor: "#000",
+        bgcolor: colors.playerBg,
         overflow: "hidden",
         cursor: controlsVisible ? "default" : "none",
       }}
@@ -210,7 +223,7 @@ export function Player() {
         sx={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
       />
 
-      {/* ── CONTROLS OVERLAY ────────────────────────────────────────────────── */}
+      {/* ── CONTROLS OVERLAY ─────────────────────────────────────────────────── */}
       <Box
         sx={{
           position: "absolute",
@@ -218,15 +231,14 @@ export function Player() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "flex-end",
-          // Deep Netflix-style gradient — transparent at top, near-opaque at bottom
-          background: "linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.5) 75%, rgba(0,0,0,0.92) 100%)",
+          background: `linear-gradient(to bottom, transparent 50%, ${colors.playerOverlay50} 75%, ${colors.playerOverlay} 100%)`,
           opacity: controlsVisible ? 1 : 0,
           transition: "opacity 0.4s ease",
           pointerEvents: controlsVisible ? "auto" : "none",
         }}
       >
         {/* Thin separator line */}
-        <Box sx={{ height: "1px", bgcolor: "rgba(255,255,255,0.07)", mx: "28px" }} />
+        <Box sx={{ height: "1px", bgcolor: colors.playerDivider, mx: "28px" }} />
 
         {/* Controls — 3-column grid so play/pause is always perfectly centred */}
         <Box
@@ -243,15 +255,22 @@ export function Player() {
             <Stack
               direction="row"
               alignItems="center"
-              sx={{ gap: "6px", px: "10px", py: "5px", border: "1px solid rgba(255,255,255,0.22)", borderRadius: "4px", userSelect: "none" }}
+              sx={{
+                gap: "6px",
+                px: "10px",
+                py: "5px",
+                border: `1px solid ${colors.playerLiveBorder}`,
+                borderRadius: "4px",
+                userSelect: "none",
+              }}
             >
               <Box
                 sx={{
                   width: 7,
                   height: 7,
                   borderRadius: "50%",
-                  bgcolor: "#ef4444",
-                  boxShadow: "0 0 6px #ef4444",
+                  bgcolor: colors.playerLive,
+                  boxShadow: `0 0 6px ${colors.playerLive}`,
                   animation: "livePulse 2s ease-in-out infinite",
                   "@keyframes livePulse": {
                     "0%, 100%": { opacity: 1 },
@@ -261,7 +280,13 @@ export function Player() {
               />
               <Box
                 component="span"
-                sx={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "#fff", lineHeight: 1 }}
+                sx={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.12em",
+                  color: colors.playerText,
+                  lineHeight: 1,
+                }}
               >
                 LIVE
               </Box>
@@ -296,26 +321,32 @@ export function Player() {
               min={0}
               max={100}
               sx={{
-                width: 100,
+                width: 110,
                 flexShrink: 0,
                 alignSelf: "center",
-                color: "#fff",
-                height: 3,
+                color: colors.playerAccent,
+                height: 5,
                 p: 0,
+                borderRadius: 1,
                 "& .MuiSlider-thumb": {
-                  width: 13,
-                  height: 13,
-                  bgcolor: "#fff",
+                  width: 12,
+                  height: 12,
+                  opacity: 0,
+                  bgcolor: colors.playerText,
                   boxShadow: "none",
-                  transition: "box-shadow 0.2s ease, width 0.15s ease, height 0.15s ease",
+                  transition: "opacity 0.2s ease, width 0.2s cubic-bezier(.47,1.64,.41,.8), height 0.2s cubic-bezier(.47,1.64,.41,.8)",
                   "&:hover, &.Mui-focusVisible": {
-                    width: 17,
-                    height: 17,
-                    boxShadow: "0 0 0 5px rgba(255,255,255,0.18)",
+                    opacity: 1,
+                    boxShadow: `0 0 0 6px ${colors.playerAccentGlow}`,
+                  },
+                  "&.Mui-active": {
+                    opacity: 1,
+                    width: 18,
+                    height: 18,
                   },
                 },
-                "& .MuiSlider-track": { border: "none", height: 3, bgcolor: "#fff" },
-                "& .MuiSlider-rail": { height: 3, bgcolor: "rgba(255,255,255,0.25)" },
+                "& .MuiSlider-track": { border: "none", height: 5, borderRadius: 1 },
+                "& .MuiSlider-rail": { height: 5, borderRadius: 1, bgcolor: colors.playerRail },
               }}
             />
 
@@ -334,23 +365,21 @@ export function Player() {
 
 // ─── STYLE TOKENS ─────────────────────────────────────────────────────────────
 
-/** Primary action — play/pause gets a slightly larger hover circle */
 const playBtnSx = {
-  color: "#fff",
+  color: colors.playerText,
   transition: "transform 0.15s ease, background-color 0.15s ease",
   "&:hover": {
-    bgcolor: "rgba(255,255,255,0.14)",
+    bgcolor: colors.playerAccentGlow,
     transform: "scale(1.08)",
   },
 } as const;
 
-/** Secondary icons — mute, fullscreen */
 const iconBtnSx = {
-  color: "rgba(255,255,255,0.85)",
+  color: colors.playerTextDim,
   transition: "color 0.15s ease, transform 0.15s ease, background-color 0.15s ease",
   "&:hover": {
-    color: "#fff",
-    bgcolor: "rgba(255,255,255,0.1)",
+    color: colors.playerText,
+    bgcolor: colors.playerAccentGlow,
     transform: "scale(1.1)",
   },
 } as const;

@@ -39,12 +39,12 @@ pnpm dev
 # HLS:    http://localhost:5173/hls/live.m3u8
 ```
 
-If you want to test with a file instead of a capture device, stop PM2 and generate HLS segments locally:
+If you want to test with a file instead of a capture device, stop PM2 and generate HLS segments locally. Example using the bundled test clip at `/media/abulo/Inbuilt HDD/my-projects/stream-tv/test-video.mp4`:
 
 ```bash
 pm2 stop FFMPEG-HLS-STREAM
 mkdir -p public/hls
-ffmpeg -re -stream_loop -1 -i sample.mp4 \
+ffmpeg -re -stream_loop -1 -i "/media/abulo/Inbuilt HDD/my-projects/stream-tv/test-video.mp4" \
   -c:v libx264 -preset veryfast -tune zerolatency -b:v 3000k -g 60 -keyint_min 60 \
   -c:a aac -b:a 128k \
   -f hls -hls_time 2 -hls_list_size 6 \

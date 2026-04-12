@@ -1,11 +1,11 @@
-import Hls from "hls.js";
-import { useEffect, useRef, useState } from "react";
-import { Box } from "@mui/material";
-import { colors } from "../../theme";
-import { ErrorState } from "./ErrorState";
-import { LiveBadge } from "./LiveBadge";
-import { PlayPause } from "./PlayPause";
-import { VolumeControls } from "./VolumeControls";
+import Hls from 'hls.js';
+import { useEffect, useRef, useState } from 'react';
+import { Box } from '@mui/material';
+import { colors } from '../../theme';
+import { ErrorState } from './ErrorState';
+import { LiveBadge } from './LiveBadge';
+import { PlayPause } from './PlayPause';
+import { VolumeControls } from './VolumeControls';
 
 export function Player() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -32,28 +32,28 @@ export function Player() {
   // Sync play/pause state from video element events
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) return undefined;
     const onPlay = () => setIsPaused(false);
     const onPause = () => setIsPaused(true);
-    video.addEventListener("play", onPlay);
-    video.addEventListener("pause", onPause);
+    video.addEventListener('play', onPlay);
+    video.addEventListener('pause', onPause);
     return () => {
-      video.removeEventListener("play", onPlay);
-      video.removeEventListener("pause", onPause);
+      video.removeEventListener('play', onPlay);
+      video.removeEventListener('pause', onPause);
     };
   }, []);
 
   // HLS setup
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) return undefined;
 
-    const src = "/hls/live.m3u8";
+    const src = '/hls/live.m3u8';
 
-    if (video.canPlayType("application/vnd.apple.mpegurl")) {
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = src;
       video.play().catch(() => {});
-      return;
+      return undefined;
     }
 
     if (Hls.isSupported()) {
@@ -76,7 +76,7 @@ export function Player() {
 
       hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
         if (data.levels.length === 0) {
-          setError("Signal jam! Time to reload and retry!");
+          setError('Signal jam! Time to reload and retry!');
           return;
         }
         video.play().catch(() => {});
@@ -84,18 +84,19 @@ export function Player() {
 
       hls.on(Hls.Events.ERROR, (_, data) => {
         if (data.fatal) {
-          setError("Signal jam! Time to reload and retry!");
+          setError('Signal jam! Time to reload and retry!');
           return;
         }
         if (data.details === Hls.ErrorDetails.MANIFEST_PARSING_ERROR) {
-          setError("Signal jam! Time to reload and retry!");
+          setError('Signal jam! Time to reload and retry!');
         }
       });
 
       return () => hls.destroy();
     }
 
-    queueMicrotask(() => setError("This browser cannot play live streams!"));
+    queueMicrotask(() => setError('This browser cannot play live streams!'));
+    return undefined;
   }, []);
 
   const handleMouseMove = () => {
@@ -147,13 +148,13 @@ export function Player() {
   return (
     <Box
       sx={{
-        position: "relative",
-        width: "100%",
+        position: 'relative',
+        width: '100%',
         maxWidth: 1280,
-        aspectRatio: "16/9",
+        aspectRatio: '16/9',
         bgcolor: colors.playerBg,
-        overflow: "hidden",
-        cursor: controlsVisible ? "default" : "none",
+        overflow: 'hidden',
+        cursor: controlsVisible ? 'default' : 'none',
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setControlsVisible(false)}
@@ -166,34 +167,36 @@ export function Player() {
         muted
         autoPlay
         playsInline
-        sx={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+        sx={{
+          width: '100%', height: '100%', objectFit: 'contain', display: 'block',
+        }}
       />
 
       {/* CONTROLS OVERLAY */}
       <Box
         sx={{
-          position: "absolute",
+          position: 'absolute',
           inset: 0,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-end",
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
           background: `linear-gradient(to bottom, transparent 50%, ${colors.playerOverlay50} 75%, ${colors.playerOverlay} 100%)`,
           opacity: controlsVisible ? 1 : 0,
-          transition: "opacity 0.4s ease",
-          pointerEvents: controlsVisible ? "auto" : "none",
+          transition: 'opacity 0.4s ease',
+          pointerEvents: controlsVisible ? 'auto' : 'none',
         }}
       >
         {/* Separator */}
-        <Box sx={{ height: "1px", bgcolor: colors.playerDivider, mx: "28px" }} />
+        <Box sx={{ height: '1px', bgcolor: colors.playerDivider, mx: '28px' }} />
 
         {/* Controls grid — 1fr | auto | 1fr keeps play/pause perfectly centred */}
         <Box
           sx={{
-            display: "grid",
-            gridTemplateColumns: "1fr auto 1fr",
-            alignItems: "center",
-            px: "28px",
-            py: "18px",
+            display: 'grid',
+            gridTemplateColumns: '1fr auto 1fr',
+            alignItems: 'center',
+            px: '28px',
+            py: '18px',
           }}
         >
           <LiveBadge />

@@ -1,6 +1,6 @@
-import { Player } from './components/player';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { Player } from './components/player';
 import { darkTheme } from './theme';
 
 export function App() {

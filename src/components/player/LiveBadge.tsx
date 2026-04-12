@@ -8,9 +8,9 @@ export function LiveBadge() {
         direction="row"
         alignItems="center"
         sx={{
-          gap: '6px',
-          px: '10px',
-          py: '5px',
+          gap: '5px',
+          px: { xs: '7px', sm: '10px' },
+          py: { xs: '4px', sm: '5px' },
           border: `1px solid ${colors.playerLiveBorder}`,
           borderRadius: '4px',
           userSelect: 'none',
@@ -18,8 +18,8 @@ export function LiveBadge() {
       >
         <Box
           sx={{
-            width: 7,
-            height: 7,
+            width: { xs: 6, sm: 7 },
+            height: { xs: 6, sm: 7 },
             borderRadius: '50%',
             bgcolor: colors.playerLive,
             boxShadow: `0 0 6px ${colors.playerLive}`,
@@ -33,7 +33,7 @@ export function LiveBadge() {
         <Box
           component="span"
           sx={{
-            fontSize: 11,
+            fontSize: { xs: 10, sm: 11 },
             fontWeight: 700,
             letterSpacing: '0.12em',
             color: colors.playerText,

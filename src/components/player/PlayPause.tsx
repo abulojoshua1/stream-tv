@@ -26,8 +26,8 @@ export function PlayPause({ isPaused, onPlay, onPause }: Props) {
       sx={playBtnSx}
     >
       {isPaused
-        ? <PlayArrowIcon sx={{ fontSize: 32 }} />
-        : <PauseIcon sx={{ fontSize: 32 }} />}
+        ? <PlayArrowIcon sx={{ fontSize: { xs: 28, sm: 30, md: 32 } }} />
+        : <PauseIcon sx={{ fontSize: { xs: 28, sm: 30, md: 32 } }} />}
     </IconButton>
   );
 }

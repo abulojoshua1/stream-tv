@@ -150,14 +150,18 @@ export function Player() {
       sx={{
         position: 'relative',
         width: '100%',
-        maxWidth: 1280,
-        aspectRatio: '16/9',
+        // Mobile: fill the full viewport so controls land at the screen bottom
+        // Tablet+: constrain to 16/9 inside the centred root
+        height: { xs: '100vh', sm: 'auto' },
+        maxWidth: { xs: 'none', sm: 1280 },
+        aspectRatio: { xs: 'unset', sm: '16/9' },
         bgcolor: colors.playerBg,
         overflow: 'hidden',
         cursor: controlsVisible ? 'default' : 'none',
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setControlsVisible(false)}
+      onTouchStart={handleMouseMove}
     >
       {/* VIDEO */}
       <Box
@@ -187,7 +191,7 @@ export function Player() {
         }}
       >
         {/* Separator */}
-        <Box sx={{ height: '1px', bgcolor: colors.playerDivider, mx: '28px' }} />
+        <Box sx={{ height: '1px', bgcolor: colors.playerDivider, mx: { xs: '16px', sm: '20px', md: '28px' } }} />
 
         {/* Controls grid — 1fr | auto | 1fr keeps play/pause perfectly centred */}
         <Box
@@ -195,8 +199,8 @@ export function Player() {
             display: 'grid',
             gridTemplateColumns: '1fr auto 1fr',
             alignItems: 'center',
-            px: '28px',
-            py: '18px',
+            px: { xs: '16px', sm: '20px', md: '28px' },
+            py: { xs: '10px', sm: '14px', md: '18px' },
           }}
         >
           <LiveBadge />

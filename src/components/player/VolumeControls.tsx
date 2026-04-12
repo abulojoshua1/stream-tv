@@ -23,10 +23,12 @@ const iconBtnSx = {
   },
 } as const;
 
+const ICON_SIZE = { xs: 24, sm: 22 } as const;
+
 function VolumeIcon({ isMuted, volume }: { isMuted: boolean; volume: number }) {
-  if (isMuted || volume === 0) return <VolumeOffIcon sx={{ fontSize: 22 }} />;
-  if (volume < 50) return <VolumeDownIcon sx={{ fontSize: 22 }} />;
-  return <VolumeUpIcon sx={{ fontSize: 22 }} />;
+  if (isMuted || volume === 0) return <VolumeOffIcon sx={{ fontSize: ICON_SIZE }} />;
+  if (volume < 50) return <VolumeDownIcon sx={{ fontSize: ICON_SIZE }} />;
+  return <VolumeUpIcon sx={{ fontSize: ICON_SIZE }} />;
 }
 
 export function VolumeControls({
@@ -38,7 +40,7 @@ export function VolumeControls({
 }: Props) {
   return (
     <Box sx={{
-      display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px',
+      display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: { xs: '4px', sm: '8px' },
     }}
     >
 
@@ -46,13 +48,15 @@ export function VolumeControls({
         <VolumeIcon isMuted={isMuted} volume={volume} />
       </IconButton>
 
+      {/* Volume slider — hidden on mobile; users control volume via system buttons */}
       <Slider
         value={volume}
         onChange={onVolumeChange}
         min={0}
         max={100}
         sx={{
-          width: 110,
+          display: { xs: 'none', sm: 'flex' },
+          width: { sm: 80, md: 110 },
           flexShrink: 0,
           alignSelf: 'center',
           color: colors.playerAccent,
@@ -81,10 +85,10 @@ export function VolumeControls({
         }}
       />
 
-      <Box sx={{ width: '12px' }} />
+      <Box sx={{ display: { xs: 'none', sm: 'block' }, width: '12px' }} />
 
       <IconButton onClick={onFullscreen} disableRipple sx={iconBtnSx}>
-        <FullscreenIcon sx={{ fontSize: 22 }} />
+        <FullscreenIcon sx={{ fontSize: ICON_SIZE }} />
       </IconButton>
 
     </Box>

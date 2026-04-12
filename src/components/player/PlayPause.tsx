@@ -1,4 +1,4 @@
-import PauseIcon from '@mui/icons-material/Pause';
+import StopIcon from '@mui/icons-material/Stop';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { IconButton } from '@mui/material';
 import { colors } from '../../theme';
@@ -27,7 +27,7 @@ export function PlayPause({ isPaused, onPlay, onPause }: Props) {
     >
       {isPaused
         ? <PlayArrowIcon sx={{ fontSize: { xs: 28, sm: 30, md: 32 } }} />
-        : <PauseIcon sx={{ fontSize: { xs: 28, sm: 30, md: 32 } }} />}
+        : <StopIcon sx={{ fontSize: { xs: 28, sm: 30, md: 32 } }} />}
     </IconButton>
   );
 }

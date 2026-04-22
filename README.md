@@ -117,3 +117,6 @@ Ensure PulseAudio and the video device are accessible to the user running PM2.
 ## Conventions
 - Package manager: pnpm only. `package-lock.json` is intentionally removed to avoid tool conflicts.
 - Linting: Airbnb base + TS + React hooks. Run `pnpm lint` before commits.
+
+## License
+Released under the [MIT License](LICENSE) — free to use, modify, and distribute.

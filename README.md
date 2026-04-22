@@ -222,12 +222,12 @@ All runtime knobs are plain env vars:
 The whole point of this project is that it's small enough to fork and bend. The two files you'll touch most:
 
 ### Customise the encode pipeline
-**Edit [`s6-rc.d/ffmpeg/run`](s6-rc.d/ffmpeg/run).** It's one FFmpeg command with three sections:
+**Edit [`entrypoint.sh`](entrypoint.sh)** (Docker flow) or **[`ecosystem.config.cjs`](ecosystem.config.cjs)** (PM2 flow). Both run the same FFmpeg command with three sections:
 1. **Input** — `-f v4l2` for the capture card, `-f pulse` for audio. Swap to `-i rtsp://…` for an IP camera, `-i file.mp4` for a file loop, `-f x11grab` for screen capture, etc.
 2. **Encode** — `libx264` preset/tune/bitrate/GOP. Swap to `h264_nvenc` / `h264_vaapi` / `h264_v4l2m2m` for hardware encoding. Change codecs, bitrates, resolution here.
 3. **Output** — HLS settings (segment length, list size, flags). Usually the last thing you'd change.
 
-If you want the PM2 flow or the `stream:test` script to reflect your changes, mirror edits to [`ecosystem.config.cjs`](ecosystem.config.cjs) and the `stream:test` entry in [`package.json`](package.json).
+If you want `pnpm stream:test` to reflect your changes too, mirror the command in [`package.json`](package.json).
 
 ### Customise the player
 **Edit [`src/components/player/`](src/components/player/).**

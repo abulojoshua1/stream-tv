@@ -48,7 +48,7 @@ export function Player() {
     const video = videoRef.current;
     if (!video) return undefined;
 
-    const src = '/hls/live.m3u8';
+    const src = import.meta.env.VITE_HLS_URL || `${import.meta.env.BASE_URL}hls/live.m3u8`;
 
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = src;

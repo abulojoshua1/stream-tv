@@ -1,7 +1,7 @@
 # 📺 Stream TV
 
-> **Turn any video source into a web stream — in one command.**
-> A minimal, self-hosted, open-source HLS streaming stack with a clean React player.
+> **A minimal, hackable HLS streaming stack. One command, any network.**
+> ~600 lines of code between a capture device and a browser. Fork it, bend it, ship it.
 
 <p>
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
@@ -15,12 +15,12 @@
 
 ## 🚀 What is Stream TV?
 
-Stream TV is four things in one repo:
+A deliberately small HLS streaming stack: FFmpeg captures, nginx serves, a React player plays. That's the whole product. It does one thing — push HLS to a browser — and leaves everything else (auth, chat, DRM, multi-bitrate, DVR) to whoever forks it.
 
-- ⚡ **A minimal self-hosted HLS streaming stack** — no media server, no cloud, no accounts.
-- 🎥 **A USB / HDMI capture → browser pipeline** — plug in a capture card, get a web stream.
-- 📺 **A drop-in HLS player with a clean UI** — autohide controls, live badge, error recovery.
-- 🧑‍💻 **A developer-friendly streaming starter kit** — Vite + React 19 + TypeScript, hack away.
+- ⚡ **Minimal by design** — no media server, no cloud, no accounts, no framework lock-in.
+- 🎥 **Direct capture → browser** — plug in a USB/HDMI capture card, get a web stream.
+- 📺 **Drop-in HLS player** — auto-hide controls, live badge, error recovery.
+- 🧑‍💻 **Built to be forked** — small enough to read end-to-end in an evening.
 
 ## 🎯 What you can build with it
 
@@ -29,7 +29,7 @@ Stream TV is four things in one repo:
 - 🧪 Test streaming pipelines locally (ships with a test-loop script)
 - ⛪ Run simple live streams — churches, events, schools, community radio
 - 🏠 Replace IP cameras with a self-hosted, privacy-respecting solution
-- 🧰 Use as a base for custom streaming apps (add auth, DVR, chat, overlays…)
+- 🧰 Use as a base for custom streaming apps — fork and add only what *you* need
 
 ## 🧠 How it works
 
@@ -95,7 +95,20 @@ Stream TV focuses on:
 | A **church / school / small org** | You want to stream a service or event without paying a SaaS |
 | A **tinkerer** | You want ~1 evening from clone to working stream |
 
-**Not a fit if** you need multi-bitrate ABR ladders, DRM, WebRTC sub-second latency, recording/DVR out of the box, or scale to thousands of concurrent viewers. Those are features you can add — they're not here yet.
+### 🚫 Out of scope — on purpose
+
+The following will **not** be added to this repo. They're all legitimate features, just not this project's job:
+
+- Multi-bitrate ABR ladders
+- DRM
+- WebRTC / sub-second latency
+- Recording / DVR / archival
+- Built-in auth (use a reverse proxy: Caddy, Traefik, nginx)
+- Chat, reactions, social overlays
+- Admin UI for runtime config
+- Multi-stream / multi-tenant
+
+If you need any of these, fork the repo and add them. The codebase is intentionally small enough (~600 LOC of actual product code) that you can do that without fighting a framework. For a more batteries-included alternative, look at [Owncast](https://owncast.online/) or [Restreamer](https://github.com/datarhei/restreamer).
 
 ---
 
@@ -196,11 +209,33 @@ All runtime knobs are plain env vars:
 | `HLS_DIR` | `/usr/share/nginx/html/hls` (compose) / `./public/hls` (PM2) | HLS output directory |
 | `FFMPEG_THREADS` | `0` | `0` = auto (all cores) |
 | `PULSE_SERVER` | `unix:/run/user/1000/pulse/native` | Pulse socket for audio in compose |
+| `VITE_HLS_URL` | *(unset)* | **Build-time** player override. If unset, the player fetches `${BASE_URL}hls/live.m3u8`. Set this to point the player at a different host, path, or CDN. |
 
 ### Runtime notes
 - nginx CORS is open for `/hls/` so the SPA can play back from any origin.
 - HLS playlists are uncached; TS segments are micro-cached (10s) in nginx.
 - Service worker caches app shell/static assets but skips `/hls/*` entirely to keep live content fresh.
+- Works behind a reverse proxy. If mounting at a sub-path, build with `vite build --base=/your-path/` so both the app and the default HLS URL are prefixed correctly. For anything more custom (different host, CDN), set `VITE_HLS_URL` at build time.
+
+## 🔧 Hacking on it
+
+The whole point of this project is that it's small enough to fork and bend. The two files you'll touch most:
+
+### Customise the encode pipeline
+**Edit [`s6-rc.d/ffmpeg/run`](s6-rc.d/ffmpeg/run).** It's one FFmpeg command with three sections:
+1. **Input** — `-f v4l2` for the capture card, `-f pulse` for audio. Swap to `-i rtsp://…` for an IP camera, `-i file.mp4` for a file loop, `-f x11grab` for screen capture, etc.
+2. **Encode** — `libx264` preset/tune/bitrate/GOP. Swap to `h264_nvenc` / `h264_vaapi` / `h264_v4l2m2m` for hardware encoding. Change codecs, bitrates, resolution here.
+3. **Output** — HLS settings (segment length, list size, flags). Usually the last thing you'd change.
+
+If you want the PM2 flow or the `stream:test` script to reflect your changes, mirror edits to [`ecosystem.config.cjs`](ecosystem.config.cjs) and the `stream:test` entry in [`package.json`](package.json).
+
+### Customise the player
+**Edit [`src/components/player/`](src/components/player/).**
+- [`index.tsx`](src/components/player/index.tsx) — main player, hls.js config, error handling.
+- [`LiveBadge.tsx`](src/components/player/LiveBadge.tsx), [`PlayPause.tsx`](src/components/player/PlayPause.tsx), [`VolumeControls.tsx`](src/components/player/VolumeControls.tsx), [`ErrorState.tsx`](src/components/player/ErrorState.tsx) — individual UI pieces, each ~50 LOC.
+- [`src/theme.ts`](src/theme.ts) — colours in one place. Rebrand here.
+
+If you're removing features: the player is flat, not abstracted — just delete what you don't need. No framework will fight you.
 
 ## 🧱 Tech stack
 
@@ -232,10 +267,12 @@ These are the lenses we use when evaluating changes. Align with them and PRs mov
 
 - 💡 Ship something used by self-hosters, small orgs, and devs in the wild
 - 🎓 Learn FFmpeg, HLS, nginx, or streaming internals with a friendly codebase
-- 📺 Build portfolio-worthy streaming features (WebRTC, DVR, chat, metrics…)
+- 🪛 Sharpen a small codebase — contributions that *reduce* LOC are welcome
 - 🏷️ Get your name on a growing open-source project
 
-…you're in the right place. We pair well with: **frontend devs** (React/TS player polish), **backend/infra folks** (FFmpeg, nginx, Docker), **SREs** (observability, deploy guides), **designers** (UI, icons, a demo GIF), and **writers** (docs, tutorials).
+…you're in the right place. We pair well with: **frontend devs** (React/TS player polish), **backend/infra folks** (FFmpeg, nginx, Docker), **designers** (UI, icons, a demo GIF), and **writers** (docs, tutorials).
+
+> **Heads up on scope.** PRs that add features from the [Out of scope](#-out-of-scope--on-purpose) list will be declined with thanks — not because the idea is bad, but because keeping this repo small is the feature. Fork freely.
 
 ### ✨ Why contribute to Stream TV?
 
@@ -250,23 +287,24 @@ These are the lenses we use when evaluating changes. Align with them and PRs mov
 
 Ranked by difficulty. Pick one, open an issue saying you're taking it, and go.
 
+All of these serve the core goal (simple, hackable, reliable HLS-to-browser on any network) without bloating scope.
+
 | Difficulty | Task | Area |
 | --- | --- | --- |
 | 🟢 Easy | Add a screenshot or demo GIF of the player to this README | Docs |
-| 🟢 Easy | Write a deploy guide (Raspberry Pi, Synology, TrueNAS, VPS) | Docs |
+| 🟢 Easy | Write a deploy guide (Raspberry Pi, Synology, TrueNAS, VPS, behind Caddy/Traefik) | Docs |
 | 🟢 Easy | Add GitHub Actions CI: install → lint → build | DevOps |
 | 🟢 Easy | Add keyboard shortcuts to the player (space, m, f, ←/→) | Frontend |
-| 🟡 Medium | Prometheus `/metrics` endpoint (segment count, dropped frames, uptime) | Backend |
-| 🟡 Medium | Web UI page to change bitrate / framerate / resolution at runtime | Full-stack |
+| 🟢 Easy | Picture-in-Picture support in the player | Frontend |
+| 🟢 Easy | Fix `bufsize` hardcoded at 2M — derive from `VIDEO_BITRATE` | Pipeline |
 | 🟡 Medium | Dockerized PulseAudio alternative for headless servers | Infra |
-| 🟡 Medium | Optional auth (basic-auth or signed-URL) on the stream endpoint | Infra |
-| 🟡 Medium | Picture-in-Picture support in the player | Frontend |
-| 🔴 Hard | Multi-bitrate ABR ladder via FFmpeg `-var_stream_map` | Pipeline |
-| 🔴 Hard | Recording / DVR with segment archival + seek UI | Full-stack |
-| 🔴 Hard | WebRTC output mode for sub-second latency | Pipeline |
-| 🔴 Hard | Chat / reactions overlay with a lightweight backend | Full-stack |
+| 🟡 Medium | Auto-discover the V4L2 device instead of hardcoding `/dev/video2` | Infra |
+| 🟡 Medium | Container healthcheck that verifies a fresh `.m3u8` is being written | Infra |
+| 🟡 Medium | Reduce LOC in the player without losing features | Frontend |
+| 🟡 Medium | Multi-arch Docker build (x86_64 + aarch64 for Raspberry Pi) | Infra |
+| 🟡 Medium | Tested reverse-proxy recipe (Caddy/Traefik/nginx) with HTTPS | Infra/Docs |
 
-Don't see your idea? **Open an issue.** We say yes more than no.
+Don't see your idea? **Open an issue** — but check the [Out of scope](#-out-of-scope--on-purpose) list first.
 
 ### 🔁 Dev loop
 

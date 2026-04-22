@@ -20,7 +20,7 @@ pnpm build        # Production build to dist/
 pnpm preview      # Serve the built app locally
 pnpm lint         # ESLint check
 pnpm lint:fix     # ESLint autofix
-pnpm stream:test  # Stop PM2 stream, loop test-video.mp4 into public/hls, then start the dev server
+pnpm stream:test  # Stop PM2 stream and loop test-video.mp4 into public/hls (run pnpm start:dev separately)
 ```
 
 ## Feeding the player in local dev (PM2-first)
@@ -40,13 +40,17 @@ pnpm start:dev
 # HLS:    http://localhost:5173/hls/live.m3u8
 ```
 
-If you want to test with a file instead of a capture device, stop PM2 and generate HLS segments locally from the bundled `./test-video.mp4`. The `stream:test` script wraps this up:
+If you want to test with a file instead of a capture device, stop PM2 and generate HLS segments locally from the bundled `./test-video.mp4`. Run the stream in one terminal and the dev server in another:
 
 ```bash
+# terminal 1 — stop the PM2 stream and loop the test file into public/hls
 pnpm stream:test
+
+# terminal 2 — run the UI with HMR
+pnpm start:dev
 ```
 
-Which is equivalent to:
+`stream:test` is equivalent to:
 
 ```bash
 pm2 stop FFMPEG-HLS-STREAM
@@ -56,9 +60,7 @@ ffmpeg -re -stream_loop -1 -i "./test-video.mp4" \
   -c:a aac -b:a 128k \
   -f hls -hls_time 2 -hls_list_size 6 \
   -hls_flags delete_segments+append_list+independent_segments \
-  -hls_segment_filename "public/hls/live_%03d.ts" public/hls/live.m3u8 &
-
-pnpm start:dev
+  -hls_segment_filename "public/hls/live_%03d.ts" public/hls/live.m3u8
 ```
 
 ## Dockerized pipeline (nginx + FFmpeg)

@@ -1,6 +1,6 @@
 services:
   web:
-    container_name: baraka-tv-web
+    container_name: stream-tv-web
     build:
       context: .
       dockerfile: Dockerfile

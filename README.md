@@ -1,6 +1,6 @@
-# Baraka TV – Live HLS Player
+# Stream TV – Live HLS Player
 
-Baraka TV is a React + TypeScript single‑page app that plays a live HLS stream exposed at `/hls/live.m3u8`. The repo also includes an nginx + FFmpeg pipeline (Docker/PM2) to capture video/audio, encode to HLS, and serve the player.
+Stream TV is a React + TypeScript single‑page app that plays a live HLS stream exposed at `/hls/live.m3u8`. The repo also includes an nginx + FFmpeg pipeline (Docker/PM2) to capture video/audio, encode to HLS, and serve the player.
 
 ## Stack
 - React 19, Vite 7, TypeScript, MUI system components

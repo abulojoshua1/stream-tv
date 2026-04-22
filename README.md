@@ -9,17 +9,18 @@ Baraka TV is a React + TypeScript single‑page app that plays a live HLS stream
 - nginx + FFmpeg container for HLS generation and delivery
 
 ## Prerequisites
-- Node 20+
+- Node 22 (pinned via `.nvmrc` — run `nvm use` in the repo root).
 - pnpm (lockfile v9). Install once: `npm install -g pnpm` or `corepack enable pnpm`.
 
 ## Install & scripts (pnpm only)
 ```bash
 pnpm install
-pnpm dev       # Vite dev server with HMR
-pnpm build     # Production build to dist/
-pnpm preview   # Serve the built app locally
-pnpm lint      # ESLint check
-pnpm lint:fix  # ESLint autofix
+pnpm start:dev    # Vite dev server with HMR
+pnpm build        # Production build to dist/
+pnpm preview      # Serve the built app locally
+pnpm lint         # ESLint check
+pnpm lint:fix     # ESLint autofix
+pnpm stream:test  # Stop PM2 stream, loop test-video.mp4 into public/hls, then start the dev server
 ```
 
 ## Feeding the player in local dev (PM2-first)
@@ -33,25 +34,31 @@ pnpm install
 pm2 start ecosystem.config.cjs
 
 # 3) Run the UI with HMR
-pnpm dev
+pnpm start:dev
 
 # Player: http://localhost:5173/
 # HLS:    http://localhost:5173/hls/live.m3u8
 ```
 
-If you want to test with a file instead of a capture device, stop PM2 and generate HLS segments locally. Example using the bundled test clip at `/media/abulo/Inbuilt HDD/my-projects/stream-tv/test-video.mp4`:
+If you want to test with a file instead of a capture device, stop PM2 and generate HLS segments locally from the bundled `./test-video.mp4`. The `stream:test` script wraps this up:
+
+```bash
+pnpm stream:test
+```
+
+Which is equivalent to:
 
 ```bash
 pm2 stop FFMPEG-HLS-STREAM
 mkdir -p public/hls
-ffmpeg -re -stream_loop -1 -i "/media/abulo/Inbuilt HDD/my-projects/stream-tv/test-video.mp4" \
+ffmpeg -re -stream_loop -1 -i "./test-video.mp4" \
   -c:v libx264 -preset veryfast -tune zerolatency -b:v 3000k -g 60 -keyint_min 60 \
   -c:a aac -b:a 128k \
   -f hls -hls_time 2 -hls_list_size 6 \
   -hls_flags delete_segments+append_list+independent_segments \
-  -hls_segment_filename "public/hls/live_%03d.ts" public/hls/live.m3u8
+  -hls_segment_filename "public/hls/live_%03d.ts" public/hls/live.m3u8 &
 
-pnpm dev
+pnpm start:dev
 ```
 
 ## Dockerized pipeline (nginx + FFmpeg)
@@ -91,7 +98,7 @@ Key parts:
 ```bash
 pnpm install
 pm2 start ecosystem.config.cjs
-pnpm dev    # or pnpm preview after build
+pnpm start:dev    # or pnpm preview after build
 ```
 
 Ensure PulseAudio and the video device are accessible to the user running PM2.

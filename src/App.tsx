@@ -1,5 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box, Stack, Typography } from '@mui/material';
+import { AmbientBackdrop } from './components/AmbientBackdrop';
 import { BrandLogo } from './components/BrandLogo';
 import { ColorModeToggle } from './components/ColorModeToggle';
 import { Player } from './components/player';
@@ -64,8 +65,11 @@ function Shell() {
           alignItems: 'center',
           py: { xs: 2, sm: 3, md: 4 },
           px: GUTTER,
+          // Anchors the accents, which fill the space the tile leaves around it.
+          position: 'relative',
         }}
       >
+        <AmbientBackdrop />
         <Player maxWidth={MEASURE} />
       </Box>
 

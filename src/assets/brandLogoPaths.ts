@@ -24,5 +24,36 @@ export const BRAND_LOGO_INK_PATH = 'M 767.5 41.9 C 748.5 60.4, 694.4 112.7, 670.
 /** The sun and the two rules beside HOSTEL, which stay orange in both themes. */
 export const BRAND_LOGO_ACCENT_PATH = 'M 463 137.1 C 357.2 149.3, 286.7 259.1, 322.6 355.9 C 327.9 370.1, 343.6 398, 346.3 398 C 346.9 398, 372.8 378.4, 436.6 329.5 C 441.6 325.7, 457.8 313.2, 472.6 301.9 C 487.4 290.6, 506.7 275.8, 515.4 268.9 C 524.2 262.1, 536.4 252.7, 542.4 248 C 548.5 243.4, 560.9 233.8, 570 226.8 C 579.1 219.8, 586.8 214, 587.2 214 C 587.6 214, 597 221.3, 608.2 230.2 C 619.4 239.1, 629.1 246.8, 629.9 247.4 C 631.7 248.8, 630.9 244.7, 626.8 232 C 606.9 170.4, 535.1 128.8, 463 137.1 M 49.5 828.3 C 44 833.1, 44.7 841.5, 50.9 845.7 L 54.3 848 124.7 848 C 202 848, 199.3 848.2, 202.5 842 C 205.4 836.4, 203.5 829.5, 198.5 827.2 C 196.6 826.3, 177.6 826, 124 826 L 52.1 826 49.5 828.3 M 1045.6 827.5 C 1037.6 831.7, 1038.1 843.4, 1046.4 847.4 C 1051.9 850, 1193.3 849.4, 1197.3 846.7 C 1204.2 842.2, 1204.4 832, 1197.7 828 C 1193.3 825.3, 1050.7 824.9, 1045.6 827.5';
 
+/*
+ * The antenna, which is not in the original artwork. The hostel's mark is a
+ * building; a building with a mast broadcasting off it is a station, and that
+ * is the whole difference between the two brands — so it is drawn here rather
+ * than the wordmark being changed, and read at favicon size it still says
+ * "signal" when no text would survive.
+ *
+ * The mast is planted on the tower's own roof peak at x 778, and these
+ * coordinates are in the artwork's space so it stays registered at any size.
+ */
+export const ANTENNA_X = 778;
+export const ANTENNA_BASE_Y = 45;
+export const ANTENNA_TIP_Y = -40;
+export const ANTENNA_MAST_WIDTH = 22;
+export const ANTENNA_TIP_RADIUS = 22;
+
+/** Three arcs off the tip. Three rather than two: two can read as a bird. */
+export const ANTENNA_WAVE_RADII = [80, 135, 190] as const;
+export const ANTENNA_WAVE_WIDTH = 18;
+
+/**
+ * The arcs' sweep, in degrees clockwise from east — so 200 to 340 is an arc
+ * that opens upward over the mast, centred on straight up.
+ */
+export const ANTENNA_WAVE_START = 200;
+export const ANTENNA_WAVE_END = 340;
+
+/** The mark plus the antenna, which needs headroom the original never had. */
+export const BRAND_ICON_VIEWBOX = '243 -268 781 818';
+export const BRAND_ICON_ASPECT = 781 / 818;
+
 /** Brand orange, constant across themes. */
 export const BRAND_ORANGE = '#f26522';

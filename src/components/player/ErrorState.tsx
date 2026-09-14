@@ -9,14 +9,20 @@ export function ErrorState({ maxWidth }: { maxWidth: number }) {
     <Box
       sx={{
         position: 'relative',
-        // Sized from the height it is given, so the tile always fits the space
-        // between header and footer. On a narrow screen `maxWidth` clamps it
-        // instead and the video letterboxes inside, which is the right
-        // trade: a fitted page beats a strictly 16/9 box that overflows.
+        // Whichever of the two runs out first is what sizes the tile, so it
+        // always fits between the header and the footer without ever being
+        // letterboxed. Landscape: the height is the scarce one, so the tile
+        // takes all of it and the width follows the ratio. Portrait: the
+        // width is, and a 16/9 box drawn from it is never tall enough to
+        // overflow — which is why this is two regimes rather than one clamp.
+        aspectRatio: '16/9',
         height: '100%',
         width: 'auto',
-        aspectRatio: '16/9',
         maxWidth: `min(100%, ${maxWidth}px)`,
+        '@media (orientation: portrait)': {
+          height: 'auto',
+          width: '100%',
+        },
         bgcolor: colors.playerBg,
         overflow: 'hidden',
         display: 'flex',

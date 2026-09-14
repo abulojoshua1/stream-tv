@@ -17,28 +17,14 @@ const MEASURE = 1280;
 /** The page gutter, and the rhythm the header and footer breathe on. */
 const GUTTER = { xs: 2, sm: 3, md: 4 };
 
-/**
- * The logo's height, and the unit the rest of the chrome is derived from: the
- * toggle's tap target is this plus its padding, and the footer's caption is
- * roughly half of it, which keeps the three in proportion as they scale.
+/*
+ * The mark's height, and the unit the rest of the chrome is derived from: the
+ * toggle's icon is a little under half of it, and the footer's captions about
+ * a quarter, which keeps the three in proportion as they scale. The mark
+ * stands alone in the header with no name beside it, so it is set a step
+ * larger than it would be as half of a lockup.
  */
-const LOGO_HEIGHT = { xs: 20, sm: 23, md: 26 };
-
-/** The lockup: the hostel wordmark, a hairline, and what this page of it is. */
-function Brand() {
-  return (
-    <Stack direction="row" alignItems="center" spacing={{ xs: 1.25, sm: 1.75 }}>
-      <BrandLogo height={LOGO_HEIGHT} />
-      <Box sx={{ width: '1px', height: LOGO_HEIGHT, bgcolor: 'divider' }} />
-      <Typography
-        variant="overline"
-        sx={{ color: 'text.secondary', lineHeight: 1, fontSize: { xs: 12, sm: 13, md: 14 } }}
-      >
-        TV
-      </Typography>
-    </Stack>
-  );
-}
+const LOGO_HEIGHT = { xs: 44, sm: 52, md: 58 };
 
 /**
  * The page is a hard-edged shell around one tile: header, player, footer line.
@@ -61,8 +47,8 @@ function Shell() {
             maxWidth: MEASURE, mx: 'auto', px: GUTTER, py: { xs: 1.5, sm: 2 },
           }}
         >
-          <Brand />
-          <ColorModeToggle size={LOGO_HEIGHT} />
+          <BrandLogo height={LOGO_HEIGHT} />
+          <ColorModeToggle size={{ xs: 20, sm: 22, md: 24 }} />
         </Stack>
       </Box>
 
@@ -94,7 +80,7 @@ function Shell() {
           }}
         >
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            Baraka TV
+            Baraka Hostel
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             Streaming live

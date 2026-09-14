@@ -12,7 +12,7 @@ export function LiveBadge() {
           px: { xs: '7px', sm: '10px' },
           py: { xs: '4px', sm: '5px' },
           border: `1px solid ${colors.playerLiveBorder}`,
-          borderRadius: '4px',
+          borderRadius: 0,
           userSelect: 'none',
         }}
       >

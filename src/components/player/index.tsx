@@ -7,7 +7,12 @@ import { LiveBadge } from './LiveBadge';
 import { PlayPause } from './PlayPause';
 import { VolumeControls } from './VolumeControls';
 
-export function Player() {
+interface PlayerProps {
+  /** The widest the tile may be drawn, in pixels. */
+  maxWidth: number;
+}
+
+export function Player({ maxWidth }: PlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -143,21 +148,28 @@ export function Player() {
   const handlePause = () => videoRef.current?.pause();
   const handleFullscreen = () => videoRef.current?.requestFullscreen?.();
 
-  if (error) return <ErrorState />;
+  if (error) return <ErrorState maxWidth={maxWidth} />;
 
   return (
     <Box
       sx={{
         position: 'relative',
-        width: '100%',
-        // Mobile: fill the full viewport so controls land at the screen bottom
-        // Tablet+: constrain to 16/9 inside the centred root
-        height: { xs: '100vh', sm: 'auto' },
-        maxWidth: { xs: 'none', sm: 1280 },
-        aspectRatio: { xs: 'unset', sm: '16/9' },
+        // Sized from the height it is given, so the tile always fits the space
+        // between header and footer. On a narrow screen `maxWidth` clamps it
+        // instead and the video letterboxes inside, which is the right
+        // trade: a fitted page beats a strictly 16/9 box that overflows.
+        height: '100%',
+        width: 'auto',
+        aspectRatio: '16/9',
+        maxWidth: `min(100%, ${maxWidth}px)`,
         bgcolor: colors.playerBg,
         overflow: 'hidden',
         cursor: controlsVisible ? 'default' : 'none',
+        // The tile reads as a lit panel on the pale page and as a plain black
+        // rectangle on the dark one, where a shadow would be invisible anyway.
+        boxShadow: (theme) => (theme.palette.mode === 'light'
+          ? '0 24px 60px -24px rgba(10,10,10,0.45)'
+          : 'none'),
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setControlsVisible(false)}

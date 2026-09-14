@@ -2,16 +2,22 @@ import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
 import {
   Alert, Box, Button, Stack,
 } from '@mui/material';
+import { colors } from '../../theme';
 
-export function ErrorState() {
+export function ErrorState({ maxWidth }: { maxWidth: number }) {
   return (
     <Box
       sx={{
         position: 'relative',
-        width: '100%',
-        height: { xs: '100vh', sm: 'auto' },
-        maxWidth: { xs: 'none', sm: 1280 },
-        aspectRatio: { xs: 'unset', sm: '16/9' },
+        // Sized from the height it is given, so the tile always fits the space
+        // between header and footer. On a narrow screen `maxWidth` clamps it
+        // instead and the video letterboxes inside, which is the right
+        // trade: a fitted page beats a strictly 16/9 box that overflows.
+        height: '100%',
+        width: 'auto',
+        aspectRatio: '16/9',
+        maxWidth: `min(100%, ${maxWidth}px)`,
+        bgcolor: colors.playerBg,
         overflow: 'hidden',
         display: 'flex',
         justifyContent: 'center',

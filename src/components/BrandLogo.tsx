@@ -33,7 +33,7 @@ interface LogoProps {
 
 /**
  * One arc of the signal, as an SVG path. Angles are degrees clockwise from
- * east in the artwork's own space, so 200 → 340 opens upward over the mast.
+ * east in the artwork's own space. Each side is centred on the antenna tip.
  */
 function waveArc(radius: number) {
   const point = (deg: number) => {
@@ -50,13 +50,7 @@ function waveArc(radius: number) {
   return `M ${x0} ${y0} A ${radius} ${radius} 0 0 1 ${x1} ${y1}`;
 }
 
-/**
- * The Baraka mark with an antenna on the tower. The wordmark is gone: at the
- * sizes this is actually seen — a header, a browser tab, a home screen — the
- * small type was unreadable anyway, and the building alone was just the
- * hostel's icon. A mast throwing three arcs off the roof is legible at 32px
- * and says what the page is without a word of text.
- */
+/** Theme-aware building mark with a compact broadcast antenna. */
 export function BrandLogo({ height, ink = 'text.primary' }: LogoProps) {
   return (
     <Box
@@ -85,22 +79,23 @@ export function BrandLogo({ height, ink = 'text.primary' }: LogoProps) {
         x2={ANTENNA_X}
         y2={ANTENNA_TIP_Y}
         stroke="currentColor"
-        strokeWidth={ANTENNA_MAST_WIDTH + 4}
+        strokeWidth={ANTENNA_MAST_WIDTH}
         strokeLinecap="round"
       />
-      <circle cx={ANTENNA_X} cy={ANTENNA_TIP_Y} r={ANTENNA_TIP_RADIUS} fill="currentColor" />
+      <circle cx={ANTENNA_X} cy={ANTENNA_TIP_Y} r={ANTENNA_TIP_RADIUS} fill={BRAND_ORANGE} />
 
-      {/* The signal, in the mark's orange — the one colour the eye lands on. */}
-      {ANTENNA_WAVE_RADII.map((radius) => (
-        <path
-          key={radius}
-          d={waveArc(radius)}
-          fill="none"
-          stroke={BRAND_ORANGE}
-          strokeWidth={ANTENNA_WAVE_WIDTH}
-          strokeLinecap="round"
-        />
-      ))}
+      {/* Mirrored signals share one centre and stroke weight at every size. */}
+      <g fill="none" stroke={BRAND_ORANGE} strokeWidth={ANTENNA_WAVE_WIDTH} strokeLinecap="round">
+        {ANTENNA_WAVE_RADII.map((radius) => (
+          <g key={radius}>
+            <path d={waveArc(radius)} />
+            <path
+              d={waveArc(radius)}
+              transform={`rotate(180 ${ANTENNA_X} ${ANTENNA_TIP_Y})`}
+            />
+          </g>
+        ))}
+      </g>
     </Box>
   );
 }

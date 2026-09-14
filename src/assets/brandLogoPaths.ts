@@ -36,24 +36,24 @@ export const BRAND_LOGO_ACCENT_PATH = 'M 463 137.1 C 357.2 149.3, 286.7 259.1, 3
  */
 export const ANTENNA_X = 778;
 export const ANTENNA_BASE_Y = 45;
-export const ANTENNA_TIP_Y = -40;
-export const ANTENNA_MAST_WIDTH = 22;
-export const ANTENNA_TIP_RADIUS = 22;
+export const ANTENNA_TIP_Y = -70;
+export const ANTENNA_MAST_WIDTH = 28;
+export const ANTENNA_TIP_RADIUS = 24;
 
-/** Three arcs off the tip. Three rather than two: two can read as a bird. */
-export const ANTENNA_WAVE_RADII = [80, 135, 190] as const;
-export const ANTENNA_WAVE_WIDTH = 18;
+/** Two evenly spaced signal arcs on each side of the transmitter. */
+export const ANTENNA_WAVE_RADII = [64, 112] as const;
+export const ANTENNA_WAVE_WIDTH = 22;
 
 /**
- * The arcs' sweep, in degrees clockwise from east — so 200 to 340 is an arc
- * that opens upward over the mast, centred on straight up.
+ * The right-hand signal sweep, in degrees clockwise from east. Rotating
+ * this arc 180 degrees produces its matching left-hand signal.
  */
-export const ANTENNA_WAVE_START = 200;
-export const ANTENNA_WAVE_END = 340;
+export const ANTENNA_WAVE_START = -48;
+export const ANTENNA_WAVE_END = 48;
 
 /** The mark plus the antenna, which needs headroom the original never had. */
-export const BRAND_ICON_VIEWBOX = '243 -268 781 818';
-export const BRAND_ICON_ASPECT = 781 / 818;
+export const BRAND_ICON_VIEWBOX = '225 -180 781 748';
+export const BRAND_ICON_ASPECT = 781 / 748;
 
 /** Brand orange, constant across themes. */
 export const BRAND_ORANGE = '#f26522';

@@ -19,7 +19,7 @@ A deliberately small HLS streaming stack: FFmpeg captures, nginx serves, a React
 
 - ⚡ **Minimal by design** — no media server, no cloud, no accounts, no framework lock-in.
 - 🎥 **Direct capture → browser** — plug in a USB/HDMI capture card, get a web stream.
-- 📺 **Drop-in HLS player** — auto-hide controls, live badge, error recovery.
+- 📺 **Drop-in HLS player** — auto-hide controls, live badge with jump-to-live, keyboard shortcuts, picture in picture, remembered volume, self-healing playback and auto-retry.
 - 🧑‍💻 **Built to be forked** — small enough to read end-to-end in an evening.
 
 ## 🎯 What you can build with it
@@ -231,9 +231,13 @@ If you want `pnpm stream:test` to reflect your changes too, mirror the command i
 
 ### Customise the player
 **Edit [`src/components/player/`](src/components/player/).**
-- [`index.tsx`](src/components/player/index.tsx) — main player, hls.js config, error handling.
-- [`LiveBadge.tsx`](src/components/player/LiveBadge.tsx), [`PlayPause.tsx`](src/components/player/PlayPause.tsx), [`VolumeControls.tsx`](src/components/player/VolumeControls.tsx), [`ErrorState.tsx`](src/components/player/ErrorState.tsx) — individual UI pieces, each ~50 LOC.
-- [`src/theme.ts`](src/theme.ts) — colours in one place. Rebrand here.
+- [`index.tsx`](src/components/player/index.tsx) — the tile, its control bar and keyboard shortcuts.
+- [`useHlsStream.ts`](src/components/player/useHlsStream.ts) — hls.js config (lazy-loaded light build), live-edge catch-up, pause-to-stop-loading, the stall watchdog and retries.
+- [`LiveBadge.tsx`](src/components/player/LiveBadge.tsx), [`ControlButton.tsx`](src/components/player/ControlButton.tsx), [`ErrorState.tsx`](src/components/player/ErrorState.tsx) — individual UI pieces.
+- [`sound.ts`](src/components/player/sound.ts) — the remembered volume/mute.
+- [`src/theme/`](src/theme/) — colours, type, motion and component styles, shared with the Baraka Hostel front-end. Rebrand here.
+
+**Keyboard:** <kbd>Space</kbd>/<kbd>K</kbd> play/stop · <kbd>M</kbd> mute · <kbd>↑</kbd>/<kbd>↓</kbd> volume · <kbd>F</kbd> full screen (or double-click) · <kbd>P</kbd> picture in picture · <kbd>L</kbd> jump to live.
 
 If you're removing features: the player is flat, not abstracted — just delete what you don't need. No framework will fight you.
 

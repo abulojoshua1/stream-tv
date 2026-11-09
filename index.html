@@ -6,7 +6,9 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png?v=3" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preload" as="image" href="/noise.gif">
+    <!-- The font is the only thing fetched from another origin: open the connections early. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <title>Baraka Streaming</title>
   </head>
   <body>

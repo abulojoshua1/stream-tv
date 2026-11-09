@@ -1,33 +1,51 @@
-import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
+import ReplayIcon from '@mui/icons-material/Replay';
 import {
-  Alert, Box, Button, Stack,
+  Box, Button, Stack, Typography,
 } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { colors } from '../../theme';
+import { EASE_OUT, rise } from '../../theme/motion';
+import type { Failure } from './useHlsStream';
 
-export function ErrorState({ maxWidth }: { maxWidth: number }) {
+/** Seconds between one attempt at the feed and the next. */
+const RETRY_EVERY = 5;
+
+interface Props {
+  failure: Failure;
+  onRetry: () => void;
+}
+
+/**
+ * No picture: static over the tile, what went wrong, and the way out. A feed
+ * that cannot be reached is tried again on its own, so a screen left on comes
+ * back by itself once the broadcast does.
+ */
+export function ErrorState({ failure, onRetry }: Props) {
+  const retries = failure === 'signal';
+  const [secondsLeft, setSecondsLeft] = useState(RETRY_EVERY);
+
+  useEffect(() => {
+    if (!retries) return undefined;
+    const timer = setInterval(() => setSecondsLeft((seconds) => seconds - 1), 1000);
+
+    return () => clearInterval(timer);
+  }, [retries]);
+
+  useEffect(() => {
+    if (retries && secondsLeft <= 0) onRetry();
+  }, [retries, secondsLeft, onRetry]);
+
   return (
     <Box
+      role="alert"
       sx={{
-        position: 'relative',
-        // Whichever of the two runs out first is what sizes the tile, so it
-        // always fits between the header and the footer without ever being
-        // letterboxed. Landscape: the height is the scarce one, so the tile
-        // takes all of it and the width follows the ratio. Portrait: the
-        // width is, and a 16/9 box drawn from it is never tall enough to
-        // overflow — which is why this is two regimes rather than one clamp.
-        aspectRatio: '16/9',
-        height: '100%',
-        width: 'auto',
-        maxWidth: `min(100%, ${maxWidth}px)`,
-        '@media (orientation: portrait)': {
-          height: 'auto',
-          width: '100%',
-        },
+        position: 'absolute',
+        inset: 0,
         bgcolor: colors.playerBg,
-        overflow: 'hidden',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        p: 2,
       }}
     >
       <Box
@@ -39,18 +57,29 @@ export function ErrorState({ maxWidth }: { maxWidth: number }) {
           opacity: 0.2,
         }}
       />
-      <Stack sx={{ zIndex: 1 }} spacing={2} alignItems="center">
-        <Alert severity="warning" variant="filled" sx={{ maxWidth: { xs: '90%', sm: 360 }, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
-          Signal jam! Time to reload and retry!
-        </Alert>
-        <Button
-          color="warning"
-          variant="outlined"
-          startIcon={<ReplayCircleFilledIcon />}
-          onClick={() => window.location.reload()}
-        >
-          Reload Stream
-        </Button>
+      <Stack
+        spacing={0.75}
+        alignItems="center"
+        sx={{
+          position: 'relative',
+          textAlign: 'center',
+          color: colors.playerText,
+          animation: `${rise} 320ms ${EASE_OUT} backwards`,
+        }}
+      >
+        <Typography variant="h6" component="p">
+          {retries ? 'Signal jam' : 'This browser cannot play live streams'}
+        </Typography>
+        <Typography variant="body2" sx={{ color: colors.playerTextDim, fontVariantNumeric: 'tabular-nums' }}>
+          {retries
+            ? `The stream is not reaching us. Trying again in ${Math.max(secondsLeft, 0)} s.`
+            : 'Open this page in a recent Chrome, Firefox, Edge or Safari.'}
+        </Typography>
+        {retries && (
+          <Button variant="contained" startIcon={<ReplayIcon />} onClick={onRetry} sx={{ mt: '16px !important' }}>
+            Try now
+          </Button>
+        )}
       </Stack>
     </Box>
   );

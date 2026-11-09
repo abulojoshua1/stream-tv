@@ -1,48 +1,53 @@
-import { Box, Stack } from '@mui/material';
+import { Box, ButtonBase } from '@mui/material';
 import { colors } from '../../theme';
+import { breathe, DURATION, EASE_OUT } from '../../theme/motion';
 
-export function LiveBadge() {
+interface Props {
+  /** Playing, and at the live edge. */
+  live: boolean;
+  onGoLive: () => void;
+}
+
+/**
+ * The hostel app's Live chip, over video: a square pip that breathes while
+ * the picture is the broadcast as it happens. Paused or fallen behind, the
+ * pip goes still and the chip becomes the way back to the live edge.
+ */
+export function LiveBadge({ live, onGoLive }: Props) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <Stack
-        direction="row"
-        alignItems="center"
+      <ButtonBase
+        onClick={onGoLive}
+        disabled={live}
+        aria-label={live ? 'Live' : 'Go to live'}
         sx={{
-          gap: '5px',
-          px: { xs: '7px', sm: '10px' },
-          py: { xs: '4px', sm: '5px' },
-          border: `1px solid ${colors.playerLiveBorder}`,
-          borderRadius: 0,
+          gap: '7px',
+          px: '9px',
+          height: 26,
+          fontSize: '0.75rem',
+          fontWeight: 400,
+          letterSpacing: '0.01em',
+          lineHeight: 1,
+          whiteSpace: 'nowrap',
+          color: colors.playerText,
+          bgcolor: colors.playerWash,
           userSelect: 'none',
+          transition: `background-color ${DURATION.hover}ms ${EASE_OUT}`,
+          '&:hover': { bgcolor: colors.playerWashStrong },
         }}
       >
         <Box
-          sx={{
-            width: { xs: 6, sm: 7 },
-            height: { xs: 6, sm: 7 },
-            borderRadius: '50%',
-            bgcolor: colors.playerLive,
-            boxShadow: `0 0 6px ${colors.playerLive}`,
-            animation: 'livePulse 2s ease-in-out infinite',
-            '@keyframes livePulse': {
-              '0%, 100%': { opacity: 1 },
-              '50%': { opacity: 0.25 },
-            },
-          }}
-        />
-        <Box
           component="span"
           sx={{
-            fontSize: { xs: 10, sm: 11 },
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            color: colors.playerText,
-            lineHeight: 1,
+            width: 8,
+            height: 8,
+            flexShrink: 0,
+            bgcolor: live ? colors.playerLive : colors.playerIdle,
+            ...(live && { animation: `${breathe} 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite` }),
           }}
-        >
-          LIVE
-        </Box>
-      </Stack>
+        />
+        {live ? 'Live' : 'Go live'}
+      </ButtonBase>
     </Box>
   );
 }

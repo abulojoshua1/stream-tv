@@ -119,6 +119,10 @@ export function Player({ maxWidth }: PlayerProps) {
     const clamped = Math.min(100, Math.max(0, nextVolume));
     video.volume = clamped / 100;
     video.muted = nextMuted;
+    // Set here as well as from the element's event, which a busy page can
+    // deliver a moment late: the control answers the hand that moved it.
+    setVolume(clamped);
+    setIsMuted(nextMuted);
     setChoseMuted(nextMuted);
     saveSound({ volume: clamped, muted: nextMuted });
   };

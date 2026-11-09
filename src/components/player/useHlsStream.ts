@@ -34,6 +34,25 @@ const STUCK_AFTER = 8;
 const STEADY_AFTER = 30;
 
 /**
+ * Where to put a playhead that has come to rest outside every stretch of
+ * picture that has arrived: the start of the next stretch ahead, or failing
+ * that the newest one. Null while it is within one, or at the end of one.
+ */
+function landingPoint(video: HTMLVideoElement): number | null {
+  const { buffered, currentTime } = video;
+  if (buffered.length === 0) return null;
+  for (let index = 0; index < buffered.length; index += 1) {
+    if (currentTime >= buffered.start(index) - 0.5 && currentTime <= buffered.end(index) + 0.5) {
+      return null;
+    }
+    if (buffered.start(index) > currentTime) return buffered.start(index) + 0.1;
+  }
+  const last = buffered.length - 1;
+
+  return Math.max(buffered.start(last), buffered.end(last) - 3);
+}
+
+/**
  * Plays the live feed in the given video element and reports how that is
  * going. Start with the sound the viewer asked for; a browser that refuses to
  * autoplay with sound gets the picture muted instead, and the element's own
@@ -100,8 +119,8 @@ export function useHlsStream(videoRef: RefObject<HTMLVideoElement | null>) {
         // Drift is closed by playing a touch faster, not by a visible jump.
         // (hls.js only does this in low-latency mode, which is otherwise
         // inert on a feed without partial segments.)
-        lowLatencyMode: false,
-        maxLiveSyncPlaybackRate: 1.1,
+        lowLatencyMode: true,
+        maxLiveSyncPlaybackRate: 1.05,
         // A live feed has nothing ahead to buffer and nothing behind worth
         // keeping, so memory stays flat however long the page is left open.
         maxBufferLength: 20,
@@ -188,14 +207,11 @@ export function useHlsStream(videoRef: RefObject<HTMLVideoElement | null>) {
       }
       steadyFor = 0;
       stuckFor += WATCH_EVERY;
-      // Adrift: sitting where there is no picture at all, rather than at the
-      // end of what has arrived (which is just a broadcast that has paused).
-      const { buffered, currentTime } = video;
-      const last = buffered.length - 1;
-      const adrift = last >= 0
-        && (currentTime > buffered.end(last) + 1 || currentTime < buffered.start(0) - 1);
-      if (stuckFor === STUCK_AFTER && adrift) {
-        video.currentTime = Math.max(buffered.start(last), buffered.end(last) - 3);
+      // Adrift: sitting in a hole with picture either side of it, rather than
+      // at the end of what has arrived (which is just a broadcast that paused).
+      const landing = landingPoint(video);
+      if (stuckFor === STUCK_AFTER && landing !== null) {
+        video.currentTime = landing;
       } else if (stuckFor >= STUCK_AFTER * 2 && !rebuiltRef.current) {
         rebuiltRef.current = true;
         setSession((current) => current + 1);
